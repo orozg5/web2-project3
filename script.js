@@ -22,11 +22,11 @@ let paddleX = (canvas.width - PADDLE_WIDTH) / 2; // Starting position of the pad
 
 let ballX = canvas.width / 2;
 let ballY = canvas.height - 38;
-// Angle of the ball movement
-let ballSpeedX = 2; // How much the ball moves horizontally
-let ballSpeedY = -ballSpeedX; // How much the ball moves vertically
+// Angle of the ball movement (randomly set from 1 to 4)
+let ballSpeedX = Math.floor(Math.random() * 3) + 1; // How much the ball moves horizontally
+let ballSpeedY = -(Math.floor(Math.random() * 3) + 1); // How much the ball moves vertically
 
-let highScore = localStorage.getItem("highScore") || 0;
+let highScore = localStorage.getItem("highScore") || 0; // Getting the high score from local storage so we can compare it with the current score
 let maxScore = BRICK_COLUMN_COUNT * BRICK_ROW_COUNT;
 let score = 0;
 let gameOver = false;
@@ -37,7 +37,7 @@ const bricks = [];
 for (let row = 0; row < BRICK_ROW_COUNT; row++) {
   bricks[row] = [];
   for (let col = 0; col < BRICK_COLUMN_COUNT; col++) {
-    bricks[row][col] = { x: 0, y: 0, status: 1 }; // status = 1 means the brick is on the screen and status = 0 means it got "destroyed" by the ball
+    bricks[row][col] = { x: 0, y: 0, status: 1 }; // status = 0 means brick got "destroyed" by the ball and status = 1 that it didn't, we need this to know which bricks to display on the screen
   }
 }
 
@@ -49,7 +49,7 @@ const drawBricks = () => {
       if (brick.status === 1) {
         // Calculate the position of the brick and update brick coordinates with it
         const brickX = colI * (BRICK_WIDTH + 2) + BRICK_X_PADDING; // 2 is to make a gap between bricks, padding is here so that the bricks can be in the middle of the screen
-        const brickY = rowI * (BRICK_HEIGHT + 2) + 30; // 2 is to make a gap between bricks, 30 is a padding for the height
+        const brickY = rowI * (BRICK_HEIGHT + 2) + 30; // 2 is to make a gap between bricks, 30 is a padding for the height so that score text doesn't overlap with the bricks
         brick.x = brickX;
         brick.y = brickY;
         // Draw the brick
@@ -63,7 +63,7 @@ const drawBricks = () => {
       }
     });
   });
-  // Remove the shadow because it would affect everything otherwise
+  // Remove the shadow because it would applay shadow to everything otherwise
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
 };
@@ -104,7 +104,7 @@ const drawScore = () => {
 const drawGameOver = () => {
   ctx.font = "32px Arial";
   let text = "GAME OVER";
-  let textWidth = ctx.measureText(text).width;
+  let textWidth = ctx.measureText(text).width; // Gets the width of the text "GAME OVER" when its font is 32px, this is so we can put the text onto the center of the screen
   ctx.fillStyle = "white";
   ctx.fillText(text, canvas.width / 2 - textWidth / 2, canvas.height / 2);
   ctx.font = "16px Arial";
@@ -139,7 +139,7 @@ const collision = () => {
           // When the score gets bigger than the last high score, we update the high score
           if (score > highScore) {
             highScore = score;
-            localStorage.setItem("highScore", highScore);
+            localStorage.setItem("highScore", highScore); // We save the high score to the local storage so that we always have access to the high score
           }
           // The goal of the game is to "destroy" all of the bricks, so when the score is equal to the max score the user has won the game
           if (score === maxScore) {
@@ -153,10 +153,10 @@ const collision = () => {
 
 // Paddle moves when left and right arrows or letters a/A and d/D are pressed and held
 document.addEventListener("keydown", (e) => {
-  // Move the paddle to the right if the position of the paddle is inside of the screen
+  // Move the paddle to the right if the position of the paddle is inside of the screen and correct key is pressed
   if ((e.key === "ArrowRight" || e.key === "d" || e.key === "D") && paddleX < canvas.width - PADDLE_WIDTH) {
     paddleX += 20;
-    // Move the paddle to the left if the position of the paddle is inside of the screen
+    // Move the paddle to the left if the position of the paddle is inside of the screen and correct key is pressed
   } else if ((e.key === "ArrowLeft" || e.key === "a" || e.key === "A") && paddleX > 0) {
     paddleX -= 20;
   }
@@ -166,7 +166,7 @@ document.addEventListener("keydown", (e) => {
 const draw = () => {
   if (!gameOver && !gameWon) {
     // Clear the canvas before each new frame
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // For example when the ball "moves" it is actually just changing the poisiton on the screen and that is a new frame and we need to clear the last one, otherwise we would have the entire path of where the ball was
     // Draw everything on the canvas
     drawBricks();
     drawPaddle();
